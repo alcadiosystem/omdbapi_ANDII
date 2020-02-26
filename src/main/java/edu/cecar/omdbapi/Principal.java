@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.opencsv.CSVWriter;
 import datos.Conexion;
 import datos.Operaciones;
+import datos.Rating;
 import datos.Serie;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +19,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +33,8 @@ import us.monoid.web.Resty;
  *
  * @author SUPER
  */
-public class Prueba {
+public class Principal {
+    
     
     private static String BASE_URL = "http://www.omdbapi.com/?apikey=77942afd&plot=full&i=";
     
@@ -53,76 +54,57 @@ public class Prueba {
     public static void main(String[] args) throws IOException, JSONException{
         //instancia de nueva conexion a base de datos
         new Conexion().getInstancia("localhost", "omdbapi", "root", "");
-        //pruebaArchivoCodigo();
-        String[] arg = analizar("getDatosPeliculas [+d d]");
         
-        System.out.println("Tamaño = " + arg.length);
-        for (int i = 0; i < arg.length; i++) {
-            System.out.println("Elemneto => " + arg[i]);
-        }
+        Scanner sc = new Scanner(System.in);
+        String comando = "";
+        System.out.println("+---------------------------------------------------------------------------+");
+        System.out.println("|                 Bienvenido al sistema omdbapi de ACME.                    |");
+        System.out.println("+---------------------------------------------------------------------------+");
+        System.out.println("|    Dentro de este sistema podrá realizar las siguientes operaciones:      |");
+        System.out.println("|    1) getDatosPeliculas [–d basededatos]                                  |");
+        System.out.println("|       'bsade datos' es opcional                                           |");
+        System.out.println("|    2) getDatosSeries [–d basededatos]                                     |");
+        System.out.println("|       'bsade datos' es requerida                                          |");
+        System.out.println("|    3) getPelicula [-n nombre|-a año]                                      |");
+        System.out.println("|       'nombre' && 'año' es opcional                                       |");
+        System.out.println("|    4) exit                                                                |");
+        System.out.println("+---------------------------------------------------------------------------+");
         
-        String test = "getDatosPeliculas [–d d]";
-        test = test.replaceAll("[\\p{Ps}\\p{Pe}]", "");
-        System.out.println(test);
-        
-//        Scanner sc = new Scanner(System.in);
-//        String comando = "";
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        System.out.println("|                 Bienvenido al sistema omdbapi de ACME.                    |");
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        System.out.println("|    Dentro de este sistema podrá realizar las siguientes operaciones:      |");
-//        System.out.println("|    1) getDatosPeliculas [–d basededatos]                                  |");
-//        System.out.println("|       'bsade datos' es opcional                                           |");
-//        System.out.println("|    2) getDatosSeries [–d basededatos]                                     |");
-//        System.out.println("|       'bsade datos' es requerida                                          |");
-//        System.out.println("|    3) getPelicula [-n nombre|-a año]                                      |");
-//        System.out.println("|       'nombre' && 'año' es opcional                                       |");
-//        System.out.println("|    4) exit                                                                |");
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        
-//        do {            
-//            System.out.println("+---------------------------------------------------------------------------+");
-//            System.out.println("|                    Ingrese el comando a ejecutar.                         |");
-//            System.out.println("+---------------------------------------------------------------------------+");
-//            comando = sc.nextLine();
-//            
-//            int rpta = comandoUsuario(comando);
-//            
-//            switch(rpta){
-//                case 0:
-//                    estado = true;
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    System.out.println("|                          Chao bambini.                                    |");
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    break;
-//                case 1:
-//                    System.out.println("Por momento el almacenamiento en DB no esta habilitado por el moento solo archivo");
-//                    System.out.println("Ejecutando el proceso del archivo");
-//                    String[] d = analizarComandos(comando);
-//                    System.out.println("0==> " + d[0]);
-//                    System.out.println("1==> " + d[1]);
-//                    if(d[1].equals(" ")){
-//                        System.out.println("No tiene nada");
-//                    }else{
-//                        System.out.println("Detecta algo");
-//                    }
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    System.out.println("|                       Terminado el proceso.                               |");
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    break;
-//                case 2:
-//                    System.out.println("getDatosSeries");
-//                    break;
-//                case 3:
-//                    System.out.println("getPelicula");
-//                    break;
-//                default:
-//                    System.out.println("Nooo");
-//                    break;
-//            }
-//            
-//        } while (!estado);
-//                
+        do {            
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|                    Ingrese el comando a ejecutar.                         |");
+            System.out.println("+---------------------------------------------------------------------------+");
+            comando = sc.nextLine();
+            
+            int rpta = comandoUsuario(comando);
+            
+            String[]d = analizarComandos(comando);
+            
+            System.out.println("ARGS = " + args.length);
+            
+            switch(rpta){
+                case 0:
+                    estado = true;
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                          Chao bambini.                                    |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    break;
+                case 1:
+                    getDatosPeliculas(d[0],d[1],1);
+                    break;
+                case 2:
+                    System.out.println("getDatosSeries");
+                    break;
+                case 3:
+                    System.out.println("getPelicula");
+                    break;
+                default:
+                    System.out.println("Nooo");
+                    break;
+            }
+            
+        } while (!estado);
+                
     }
     
     /**
@@ -133,13 +115,11 @@ public class Prueba {
     private static Serie getDatosURL(String codigo){
         
         try {
-            //Intnacia de la libreria resty que dijo
             Resty resty = new Resty();
-            //Esta es la libreria de google para manejo de json
             Gson gson = new Gson();
-            //Obtenemos el objeto json desde la api
+            
             JSONObject resultado = resty.json(BASE_URL + codigo).object();
-            //Mediante la libreria de ggogle gson convertimos el objeto json en objeto de clase serie
+            
             serie = gson.fromJson(resultado.toString(), Serie.class);
                         
         } catch (Exception e) {
@@ -161,14 +141,9 @@ public class Prueba {
     private static List<Serie> leerArchivoCodigo() throws FileNotFoundException, IOException{
         
         listaSerieURL = new ArrayList<Serie>();
-        /**
-         * El archivo hola.txt contiene un pequeño contenido de los codigos
-         * Los archivos codigos y series son los que pasasate y generan ese problemita
-         * El archivo serie2 es el nuevo que copie el contenido y pege hablar con medez de eso
-         * ojo borrar este comentario
-         */
+        
         File codigo = new File("./src/main/java/recurso/hola.txt");
-        //Por si las moscas establecemos la codificacion utf-8
+        
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(codigo), "utf-8"));
         
         String cadena;
@@ -176,10 +151,8 @@ public class Prueba {
         while((cadena = br.readLine())!=null){
             
             cadena = cadena.replaceAll("\n", "");
-            //Llamamos al metodo que obtiene los datos desde la api
-            Serie s = getDatosURL(cadena);
             
-            System.out.println("Mouestro => " + s.toString());
+            Serie s = getDatosURL(cadena);
             
             if(s.getResponse().equals("False")){
                 System.out.println("+--------------------------------------------------+");
@@ -195,28 +168,8 @@ public class Prueba {
             }
         }
         System.out.println("Proceso de obtencion de datos finalizado");
+        
         return listaSerieURL;
-    }
-    
-    
-    private static void pruebaArchivoCodigo() throws FileNotFoundException, IOException{
-                
-        
-        File codigo = new File("./src/main/java/recurso/series.txt");
-        
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(codigo), "utf-8"));
-        
-        String cadena;
-        
-        while((cadena = br.readLine())!=null){
-            cadena = cadena.replaceAll("^\\\\s*","");
-            
-            System.out.println("Codigo => " + cadena.replaceAll("\\s","")); //Muestra el problema de lectura
-            
-//            Serie s = getDatosURL(cadena);   este muestra el error de la api
-//            System.out.println("Mouestro => " + s.toString());
-        }        
-        
     }
     
     
@@ -246,25 +199,25 @@ public class Prueba {
      * @throws IOException 
      */
     private static void archivoCSV(List<Serie> lista) throws IOException{               
-        //Establecemos el archivo
+        
         File fichero = new File(rutaCSV);
-        //La libreria opencsv la instanciamos para la creacion de los archivos
+        
         CSVWriter csv;
-        //verificamos si existe
+        
         if(!fichero.exists()){
-            //Si no existe lo creamos
+            
             if(fichero.createNewFile()){
-                //Lo abrimos para escribirlo
+                
                 csv = new CSVWriter(new FileWriter(fichero));
-                //El formato csv es un formato de datos especial, para eso lo convertimos asi
+                
                 List<String[]> data = toArrayString(lista);
-                //Lo mandamos a escribir
+                
                 csv.writeAll(data);
-                //Cerramos
+                
                 csv.close();
             }
         }else{
-            //Jajajajay lo mismo de arriba x2
+            
             csv = new CSVWriter(new FileWriter(fichero));
             List<String[]> data = toArrayString(lista);
             csv.writeAll(data);
@@ -279,13 +232,11 @@ public class Prueba {
      * @return 
      */
     private static List<String[]> toArrayString(List<Serie> lista){
-        //Este metodo lo proporciona la pagina asi que no problem ellos te dicen que lo uses
-        //Preguntar al mendez por que el primer parametro lo guarda si problemas y el reto le agrega "" en el archivo
+        
         List<String[]> records = new ArrayList<String[]>();
-        //Aqui hacemos la convercion de los datos
+        
         Iterator<Serie> it = lista.iterator();
         while(it.hasNext()){
-            //Y aqui tambien
             Serie s = it.next();
             records.add(
                     new String[] {
@@ -358,6 +309,10 @@ public class Prueba {
             
         }else if(comando.equals("-a")){
             
+        }else{
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|              El comando ingresado no es el correcto.                      |");
+            System.out.println("+---------------------------------------------------------------------------+");
         }
     }
     
@@ -366,7 +321,32 @@ public class Prueba {
      * @param comando
      * @param parametro 
      */
-    private static void getDatosSeries(String comando,String parametro){
+    private static void getDatosSeries(String comando,String parametro) throws IOException{
+        
+        if(comando.equals("-d")){
+            if(parametro.equals("omdbapi")){
+                
+                List<Serie> lista = leerArchivoCodigo();
+                boolean insert = false;
+                for (Serie s : lista) {
+                    insert = Operaciones.setInsertSerie(s);
+                    if(!insert){
+                        break;
+                    }
+                }
+                
+            }else{
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                System.out.println("+---------------------------------------------------------------------------+");
+            }
+        }else{
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|              El comando ingresado no es el correcto.                      |");
+            System.out.println("+---------------------------------------------------------------------------+");
+        }
+        
+        
         
     }
     
@@ -377,46 +357,63 @@ public class Prueba {
      * @param parametro
      * @param aux 
      */
-    private static void getDatosPeliculas(String comando, String parametro, int aux){
-        if(aux == 0){
-            
-        }else if(comando.equals("-b")){
-            if(parametro.equals("omdbapi")){
-                
+    private static void getDatosPeliculas(String comando, String parametro, int aux) throws IOException{
+        if(comando.equals("d")){
+            if(aux == 0){
+                isDB = false;
+                archivoCSV(leerArchivoCodigo());
+            }else if(parametro.equals("omdbapi")){
+                isDB = true;
+                leerArchivoCodigo();
+                for (Serie s : listaSerieURL) {
+                    Operaciones.setInsertSerie(s);
+                    for (Rating rating : s.getRatings()) {
+                        Operaciones.setInsertRating(s.getImdbID(), rating.getSource(), rating.getValue());
+                    }
+                }
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                    Base de datos completa.                                |");
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                       Terminado el proceso.                               |");
+                System.out.println("+---------------------------------------------------------------------------+");
             }else{
                 System.out.println("+---------------------------------------------------------------------------+");
                 System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
                 System.out.println("+---------------------------------------------------------------------------+");
             }
+        }else{
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|              El comando ingresado no es el correcto.                      |");
+            System.out.println("+---------------------------------------------------------------------------+");
         }
     }
-    
     
     private static String[] analizarComandos(String cmd){
         
         int comando = cmd.indexOf("d");
-        System.out.println("Comando " + comando);
-        System.out.println("CMD " + cmd.length());
+               
         String parametro = cmd.substring(comando+1, (cmd.length()-1));
+        
         parametro = parametro.trim();
+        
         parametro = parametro.replaceAll("\\s", "+");
-        System.out.println("Parametro =>" + parametro);
-        String[] resul = {cmd.substring(comando-1, comando+1), parametro};
+        
+        String[] resul = {cmd.substring(comando, comando+1), parametro};
+        
         return resul;
     }
     
+    /***
+     * Funcion que permite analizar lo ingresado por consola y separar los comandos de los paramatros
+     * @param cmd
+     * @return 
+     */
     private static String[] analizar(String cmd){
         
         cmd = cmd.replaceAll("[\\p{Ps}\\p{Pe}]", "");
         
         String[] args = cmd.split(" ");
-        String mas = args[1].toString();
-        System.out.println("Mas " + mas);
-        if(mas.contains("+")){
-            System.out.println("Si" + args[1]);
-        }else{
-            System.out.println("Nellllll");
-        }
                 
         return args;
     }

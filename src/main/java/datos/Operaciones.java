@@ -8,13 +8,18 @@ package datos;
 import java.sql.PreparedStatement;
 
 /**
- *
+ * Clase que ejecuta las operaciones con la base de datos
  * @author SUPER
  */
 public class Operaciones {
     
     private static boolean estado = false;
     
+    /**
+     * Funcion que permite insertar una pelicula y/o serie en la base de datos
+     * @param s
+     * @return 
+     */
     public static boolean setInsertSerie(Serie s){
         try {
             PreparedStatement st = SentenciasSQL.setInsertSerie();
@@ -62,5 +67,35 @@ public class Operaciones {
         return estado;
     }
     
-    
+    /***
+     * Funcion que permite insertar un rating
+     * @param s
+     * @return 
+     */
+    public static boolean setInsertRating(String imdbRating, String source, String value){
+        try {
+            PreparedStatement st = SentenciasSQL.setInsertRating();
+                        
+            st.setString(1, imdbRating);
+            st.setString(2, source);
+            st.setString(3, value);
+            
+            int n = st.executeUpdate();
+            
+            if(n != 0){
+                estado = true;
+            }else{
+                estado = false;
+            }
+            
+        } catch (Exception e) {
+            System.out.println("+--------------------------------------------------+");
+            System.out.println("|     Error al tratar de insertar los datos.       |");
+            System.out.println("+--------------------------------------------------+");
+            System.out.println("|     Codigo de error=>"+imdbRating+".       |");
+            System.out.println(e.getMessage());
+            System.out.println("+--------------------------------------------------+");
+        }
+        return estado;
+    }
 }

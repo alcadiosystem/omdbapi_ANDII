@@ -20,7 +20,6 @@ public class Conexion {
     /**
      * Metodo que establece una conexion con una base de datos que le pase por
      * parametros
-     *
      * @param servidor Direccion ip donde se encuentra la base de datos
      * @param DB Nombre de la base de datos
      * @param usuario Usuario del motor de la base de datos
@@ -53,7 +52,6 @@ public class Conexion {
 
     /**
      * Obtiene una conexion
-     *
      * @return conectar
      */
     public static Connection getConexion() {

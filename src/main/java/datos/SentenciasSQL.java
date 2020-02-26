@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- *
+ * Clase que prepara las sentencias sql de las operaciones
  * @author SUPER
  */
 public class SentenciasSQL {
@@ -23,6 +23,8 @@ public class SentenciasSQL {
     private static PreparedStatement selectByYear;
     
     private static PreparedStatement selectByNamYear;
+    
+    private static PreparedStatement insertRating;
     
     public static PreparedStatement setInsertSerie() throws SQLException{
         inseratarSerie = Conexion.getConexion().prepareStatement("INSERT INTO `omdbapi`.`seire` (`actors`, `awards`, `country`, `director`, `episode`, `genre`, `language`, `metascore`, `plot`, `poster`, `rated`, `released`, `response`, `runtime`, `season`, `title`, `type`, `writer`, `year`, `imdbID`, `imdbRating`, `imdbVotes`, `seriesID`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -47,6 +49,11 @@ public class SentenciasSQL {
     public static PreparedStatement getSelectByNamYear() throws SQLException{
         selectByNamYear = Conexion.getConexion().prepareStatement("SELECT * FROM seire WHERE seire.`year` = ? AND seire.title = ?");
         return selectByNamYear;
+    }
+    
+    public static PreparedStatement setInsertRating() throws SQLException{
+        insertRating = Conexion.getConexion().prepareStatement("INSERT INTO `omdbapi`.`rating` (`imdbID`, `source`, `value`) VALUES (?, ?, ?)");
+        return insertRating;
     }
     
 }
