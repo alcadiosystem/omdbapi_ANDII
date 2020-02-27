@@ -54,7 +54,7 @@ public class Prueba {
         //instancia de nueva conexion a base de datos
         new Conexion().getInstancia("localhost", "omdbapi", "root", "");
         //pruebaArchivoCodigo();
-        String[] arg = analizar("getDatosPeliculas [+d d]");
+        String[] arg = analizar("getDatosPeliculas [-d d]");
         
         System.out.println("Tamaño = " + arg.length);
         for (int i = 0; i < arg.length; i++) {
@@ -65,64 +65,52 @@ public class Prueba {
         test = test.replaceAll("[\\p{Ps}\\p{Pe}]", "");
         System.out.println(test);
         
-//        Scanner sc = new Scanner(System.in);
-//        String comando = "";
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        System.out.println("|                 Bienvenido al sistema omdbapi de ACME.                    |");
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        System.out.println("|    Dentro de este sistema podrá realizar las siguientes operaciones:      |");
-//        System.out.println("|    1) getDatosPeliculas [–d basededatos]                                  |");
-//        System.out.println("|       'bsade datos' es opcional                                           |");
-//        System.out.println("|    2) getDatosSeries [–d basededatos]                                     |");
-//        System.out.println("|       'bsade datos' es requerida                                          |");
-//        System.out.println("|    3) getPelicula [-n nombre|-a año]                                      |");
-//        System.out.println("|       'nombre' && 'año' es opcional                                       |");
-//        System.out.println("|    4) exit                                                                |");
-//        System.out.println("+---------------------------------------------------------------------------+");
-//        
-//        do {            
-//            System.out.println("+---------------------------------------------------------------------------+");
-//            System.out.println("|                    Ingrese el comando a ejecutar.                         |");
-//            System.out.println("+---------------------------------------------------------------------------+");
-//            comando = sc.nextLine();
-//            
-//            int rpta = comandoUsuario(comando);
-//            
-//            switch(rpta){
-//                case 0:
-//                    estado = true;
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    System.out.println("|                          Chao bambini.                                    |");
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    break;
-//                case 1:
-//                    System.out.println("Por momento el almacenamiento en DB no esta habilitado por el moento solo archivo");
-//                    System.out.println("Ejecutando el proceso del archivo");
-//                    String[] d = analizarComandos(comando);
-//                    System.out.println("0==> " + d[0]);
-//                    System.out.println("1==> " + d[1]);
-//                    if(d[1].equals(" ")){
-//                        System.out.println("No tiene nada");
-//                    }else{
-//                        System.out.println("Detecta algo");
-//                    }
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    System.out.println("|                       Terminado el proceso.                               |");
-//                    System.out.println("+---------------------------------------------------------------------------+");
-//                    break;
-//                case 2:
-//                    System.out.println("getDatosSeries");
-//                    break;
-//                case 3:
-//                    System.out.println("getPelicula");
-//                    break;
-//                default:
-//                    System.out.println("Nooo");
-//                    break;
-//            }
-//            
-//        } while (!estado);
-//                
+        Scanner sc = new Scanner(System.in);
+        String comando = "";
+        System.out.println("+---------------------------------------------------------------------------+");
+        System.out.println("|                 Bienvenido al sistema omdbapi de ACME.                    |");
+        System.out.println("+---------------------------------------------------------------------------+");
+        System.out.println("|    Dentro de este sistema podrá realizar las siguientes operaciones:      |");
+        System.out.println("|    1) getDatosPeliculas [–d basededatos]                                  |");
+        System.out.println("|       'bsade datos' es opcional                                           |");
+        System.out.println("|    2) getDatosSeries [–d basededatos]                                     |");
+        System.out.println("|       'bsade datos' es requerida                                          |");
+        System.out.println("|    3) getPelicula [-n nombre|-a año]                                      |");
+        System.out.println("|       'nombre' && 'año' es opcional                                       |");
+        System.out.println("|    4) exit                                                                |");
+        System.out.println("+---------------------------------------------------------------------------+");
+        
+        do {            
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|                    Ingrese el comando a ejecutar.                         |");
+            System.out.println("+---------------------------------------------------------------------------+");
+            comando = sc.nextLine();
+            System.out.println("Comando ==> " + comando);
+            int rpta = comandoUsuario(comando);
+            
+            switch(rpta){
+                case 0:
+                    estado = true;
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                          Chao bambini.                                    |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    break;
+                case 1:
+                    getDatosPeliculas(analizar(comando));
+                    break;
+                case 2:
+                    System.out.println("getDatosSeries");
+                    break;
+                case 3:
+                    System.out.println("getPelicula");
+                    break;
+                default:
+                    System.out.println("Nooo");
+                    break;
+            }
+            
+        } while (!estado);
+                
     }
     
     /**
@@ -227,12 +215,14 @@ public class Prueba {
      */
     private static int comandoUsuario(String cmd){                
         
+        cmd = cmd.toLowerCase();
+        
         int res = 0;
-        if(cmd.contains("getDatosPeliculas")){
+        if(cmd.contains("getdatospeliculas")){
             res = 1;
-        }else if(cmd.contains("getDatosSeries")){
+        }else if(cmd.contains("getdatosseries")){
             res = 2;
-        }else if(cmd.contains("getPelicula")){
+        }else if(cmd.contains("getpelicula")){
             res = 3;
         }else if(cmd.contains("exit")){
             res = 0;
@@ -377,47 +367,64 @@ public class Prueba {
      * @param parametro
      * @param aux 
      */
-    private static void getDatosPeliculas(String comando, String parametro, int aux){
-        if(aux == 0){
-            
-        }else if(comando.equals("-b")){
-            if(parametro.equals("omdbapi")){
-                
+    private static void getDatosPeliculas(String[] cmd){
+        System.out.println("Tamaño " + cmd.length);
+        if(cmd.length == 3){
+            String comando = cmd[1].toString();
+            String base_datos = cmd[2];
+            if(comando.contains("-d")){
+                if(base_datos.contains("omdbapi")){
+                    isDB = true;
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Proceso Iniciado.                                   |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    
+                    
+                    
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                    Base de datos completa.                                |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Terminado el proceso.                               |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                }else{
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                }
             }else{
                 System.out.println("+---------------------------------------------------------------------------+");
-                System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                System.out.println("|              El comando ingresado no es el correcto.                      |");
                 System.out.println("+---------------------------------------------------------------------------+");
             }
+        }else if(cmd.length == 2){
+            String comando = cmd[1].toString();
+            if(comando.contains("-d")){
+                isDB = false;
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|        No se especifico una base de datos, se creara un archivo csv       |");
+                System.out.println("+---------------------------------------------------------------------------+");
+            }else{
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|              El comando ingresado no es el correcto.                      |");
+                System.out.println("+---------------------------------------------------------------------------+");
+            }
+        }else if(cmd.length == 1 || cmd.length == 0){
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|              El comando ingresado no es el correcto.                      |");
+            System.out.println("+---------------------------------------------------------------------------+");
         }
     }
     
     
-    private static String[] analizarComandos(String cmd){
-        
-        int comando = cmd.indexOf("d");
-        System.out.println("Comando " + comando);
-        System.out.println("CMD " + cmd.length());
-        String parametro = cmd.substring(comando+1, (cmd.length()-1));
-        parametro = parametro.trim();
-        parametro = parametro.replaceAll("\\s", "+");
-        System.out.println("Parametro =>" + parametro);
-        String[] resul = {cmd.substring(comando-1, comando+1), parametro};
-        return resul;
-    }
+    
     
     private static String[] analizar(String cmd){
         
         cmd = cmd.replaceAll("[\\p{Ps}\\p{Pe}]", "");
         
         String[] args = cmd.split(" ");
-        String mas = args[1].toString();
-        System.out.println("Mas " + mas);
-        if(mas.contains("+")){
-            System.out.println("Si" + args[1]);
-        }else{
-            System.out.println("Nellllll");
-        }
-                
+            
         return args;
     }
     

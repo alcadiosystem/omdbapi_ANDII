@@ -40,7 +40,7 @@ public class Principal {
     
     private static boolean estado = false;
     
-    private static boolean isDB = true;
+    private static boolean isDB = false;
     
     private static final String rutaCSV = "./src/main/java/recurso/base_datos.csv";
     
@@ -78,10 +78,6 @@ public class Principal {
             
             int rpta = comandoUsuario(comando);
             
-            String[]d = analizarComandos(comando);
-            
-            System.out.println("ARGS = " + args.length);
-            
             switch(rpta){
                 case 0:
                     estado = true;
@@ -90,13 +86,13 @@ public class Principal {
                     System.out.println("+---------------------------------------------------------------------------+");
                     break;
                 case 1:
-                    getDatosPeliculas(d[0],d[1],1);
+                    getDatosPeliculas(analizar(comando));
                     break;
                 case 2:
-                    System.out.println("getDatosSeries");
+                    getDatosSeries(analizar(comando));
                     break;
                 case 3:
-                    System.out.println("getPelicula");
+                    getPelicula(analizar(comando),comando);
                     break;
                 default:
                     System.out.println("Nooo");
@@ -280,6 +276,7 @@ public class Principal {
      */
     private static void buscarElementoCSV(String buscar){
         String csvSplitBy = ",";
+        buscar = buscar.toLowerCase();
         for (String res : listaCSVExtraida) {
             res = res.toLowerCase();
             if(res.contains(buscar)){
@@ -296,22 +293,88 @@ public class Principal {
      * @param parametro
      * @param aux 
      */
-    private static void getPelicula(String comando, String parametro, int aux){
-        
-        if(aux == 0){
-            String csvSplitBy = ",";
-            for (String res : listaCSVExtraida) {
-                res = res.toLowerCase();
-                String[] datos = res.split(csvSplitBy);
-                System.out.println("Mostrar => " + datos[0]);
-            }
-        }else if(comando.equals("-b")){
+    private static void getPelicula(String[] cmd, String com){
+        int aux = com.indexOf("a");
+        int aux2 = com.indexOf("n");                
+        if(isDB){
+            System.out.println("Espere un momento....");
+            ArrayList<Serie> listaS = Operaciones.getSerieDatos();
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|                    Base de datos seleccionada.                            |");
+            System.out.println("+---------------------------------------------------------------------------+");
             
-        }else if(comando.equals("-a")){
+            if(cmd.length >= 3){
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                       Proceso Iniciado.                                   |");
+                System.out.println("+---------------------------------------------------------------------------+");
+                String comando = cmd[1].toString();
+                if(comando.contains("-a")){
+                    String parametro = com.substring(aux+5, com.length()-1);
+                    for (Serie s : listaS) {
+                        if(s.getYear().contains(parametro.trim())){
+                            System.out.println(s.toString());
+                        }
+                    }
+                }else if(comando.contains("-n")){
+                    String parametro = com.substring(aux2+2, com.length()-1);
+                    for (Serie s : listaS) {
+                        if(s.getTitle().contains(parametro)){
+                            System.out.println(s.toString());
+                        }
+                    }
+                }else{
+                    System.out.println("==> ");
+                }
+            }else if(cmd.length == 2){
+                System.out.println("+-------------------+--------------------------------------------------------+");
+                System.out.println("|  Codgo            |                       Titulo                           |");
+                System.out.println("+-------------------+--------------------------------------------------------+");
+                for (Serie s : listaS) {
+                System.out.println("|"+s.getImdbID()+"  | "+s.getTitle()+"|");
+                }
+                System.out.println("+-------------------+--------------------------------------------------------+");
+            }else if(cmd.length <= 1){
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                Tiene que ingresar comandos.                               |");
+                System.out.println("+---------------------------------------------------------------------------+");
+            }
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|                       Terminado el proceso.                               |");
+            System.out.println("+---------------------------------------------------------------------------+");
             
         }else{
+            leerCSV();
             System.out.println("+---------------------------------------------------------------------------+");
-            System.out.println("|              El comando ingresado no es el correcto.                      |");
+            System.out.println("|                    Archivo de datos seleccionada.                         |");
+            System.out.println("+---------------------------------------------------------------------------+");
+            
+            if(cmd.length >= 3){
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                       Proceso Iniciado.                                   |");
+                System.out.println("+---------------------------------------------------------------------------+");
+                String comando = cmd[1].toString();
+                if(comando.contains("-a")){
+                    String parametro = com.substring(aux+5, com.length()-1);
+                    buscarElementoCSV(parametro);
+                }else if(comando.contains("-n")){                    
+                    String parametro = com.substring(aux2+2, com.length()-1);                    
+                    System.out.println("NNN " + parametro);
+                    buscarElementoCSV(parametro);
+                }
+            }else if(cmd.length == 2){
+                System.out.println("+-------------------+--------------------------------------------------------+");
+                System.out.println("|  Codgo            |                       Titulo                           |");
+                System.out.println("+-------------------+--------------------------------------------------------+");
+                
+                System.out.println("+-------------------+--------------------------------------------------------+");
+            }else if(cmd.length <= 1){
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|                Tiene que ingresar comandos.                               |");
+                System.out.println("+---------------------------------------------------------------------------+");
+            }                    
+
+            System.out.println("+---------------------------------------------------------------------------+");
+            System.out.println("|                       Terminado el proceso.                               |");
             System.out.println("+---------------------------------------------------------------------------+");
         }
     }
@@ -321,26 +384,43 @@ public class Principal {
      * @param comando
      * @param parametro 
      */
-    private static void getDatosSeries(String comando,String parametro) throws IOException{
+    private static void getDatosSeries(String[] cmd) throws IOException{
         
-        if(comando.equals("-d")){
-            if(parametro.equals("omdbapi")){
-                
-                List<Serie> lista = leerArchivoCodigo();
-                boolean insert = false;
-                for (Serie s : lista) {
-                    insert = Operaciones.setInsertSerie(s);
-                    if(!insert){
-                        break;
+        if(cmd.length == 3){
+            String comando = cmd[1].toString();
+            String base_datos = cmd[2];
+            if(comando.contains("-d")){
+                if(base_datos.contains("omdbapi")){
+                    isDB = true;
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Proceso Iniciado.                                   |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    
+                    leerArchivoCodigo();
+                    for (Serie s : listaSerieURL) {
+                        Operaciones.setInsertSerie(s);
+                        for (Rating rating : s.getRatings()) {
+                            Operaciones.setInsertRating(s.getImdbID(), rating.getSource(), rating.getValue());
+                        }
                     }
+                    
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                    Base de datos completa.                                |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Terminado el proceso.                               |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                }else{
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                    System.out.println("+---------------------------------------------------------------------------+");
                 }
-                
             }else{
                 System.out.println("+---------------------------------------------------------------------------+");
-                System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                System.out.println("|              El comando ingresado no es el correcto.                      |");
                 System.out.println("+---------------------------------------------------------------------------+");
-            }
-        }else{
+            }        
+        }else if(cmd.length == 1 || cmd.length == 0 || cmd.length == 2){
             System.out.println("+---------------------------------------------------------------------------+");
             System.out.println("|              El comando ingresado no es el correcto.                      |");
             System.out.println("+---------------------------------------------------------------------------+");
@@ -357,51 +437,62 @@ public class Principal {
      * @param parametro
      * @param aux 
      */
-    private static void getDatosPeliculas(String comando, String parametro, int aux) throws IOException{
-        if(comando.equals("d")){
-            if(aux == 0){
-                isDB = false;
-                archivoCSV(leerArchivoCodigo());
-            }else if(parametro.equals("omdbapi")){
-                isDB = true;
-                leerArchivoCodigo();
-                for (Serie s : listaSerieURL) {
-                    Operaciones.setInsertSerie(s);
-                    for (Rating rating : s.getRatings()) {
-                        Operaciones.setInsertRating(s.getImdbID(), rating.getSource(), rating.getValue());
+    private static void getDatosPeliculas(String[] cmd) throws IOException{
+        if(cmd.length == 3){
+            String comando = cmd[1].toString();
+            String base_datos = cmd[2];
+            if(comando.contains("-d")){
+                if(base_datos.contains("omdbapi")){
+                    isDB = true;
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Proceso Iniciado.                                   |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    
+                    leerArchivoCodigo();
+                    for (Serie s : listaSerieURL) {
+                        Operaciones.setInsertSerie(s);
+                        for (Rating rating : s.getRatings()) {
+                            Operaciones.setInsertRating(s.getImdbID(), rating.getSource(), rating.getValue());
+                        }
                     }
+                    
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                    Base de datos completa.                                |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|                       Terminado el proceso.                               |");
+                    System.out.println("+---------------------------------------------------------------------------+");
+                }else{
+                    System.out.println("+---------------------------------------------------------------------------+");
+                    System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                    System.out.println("+---------------------------------------------------------------------------+");
                 }
+            }else{
                 System.out.println("+---------------------------------------------------------------------------+");
-                System.out.println("|                    Base de datos completa.                                |");
+                System.out.println("|              El comando ingresado no es el correcto.                      |");
                 System.out.println("+---------------------------------------------------------------------------+");
+            }
+        }else if(cmd.length == 2){
+            String comando = cmd[1].toString();
+            if(comando.contains("-d")){
+                isDB = false;
+                System.out.println("+---------------------------------------------------------------------------+");
+                System.out.println("|        No se especifico una base de datos, se creara un archivo csv       |");
+                System.out.println("+---------------------------------------------------------------------------+");
+                archivoCSV(leerArchivoCodigo());
                 System.out.println("+---------------------------------------------------------------------------+");
                 System.out.println("|                       Terminado el proceso.                               |");
                 System.out.println("+---------------------------------------------------------------------------+");
             }else{
                 System.out.println("+---------------------------------------------------------------------------+");
-                System.out.println("|           El nombre de la base de datos es incorrecta.                    |");
+                System.out.println("|              El comando ingresado no es el correcto.                      |");
                 System.out.println("+---------------------------------------------------------------------------+");
             }
-        }else{
+        }else if(cmd.length == 1 || cmd.length == 0){
             System.out.println("+---------------------------------------------------------------------------+");
             System.out.println("|              El comando ingresado no es el correcto.                      |");
             System.out.println("+---------------------------------------------------------------------------+");
         }
-    }
-    
-    private static String[] analizarComandos(String cmd){
-        
-        int comando = cmd.indexOf("d");
-               
-        String parametro = cmd.substring(comando+1, (cmd.length()-1));
-        
-        parametro = parametro.trim();
-        
-        parametro = parametro.replaceAll("\\s", "+");
-        
-        String[] resul = {cmd.substring(comando, comando+1), parametro};
-        
-        return resul;
     }
     
     /***

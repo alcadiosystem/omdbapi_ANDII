@@ -18,13 +18,11 @@ public class SentenciasSQL {
     
     private static PreparedStatement selectAllSerie;
     
-    private static PreparedStatement selectByName;
-    
-    private static PreparedStatement selectByYear;
-    
-    private static PreparedStatement selectByNamYear;
+    private static PreparedStatement selectRatings;
     
     private static PreparedStatement insertRating;
+    
+    
     
     public static PreparedStatement setInsertSerie() throws SQLException{
         inseratarSerie = Conexion.getConexion().prepareStatement("INSERT INTO `omdbapi`.`seire` (`actors`, `awards`, `country`, `director`, `episode`, `genre`, `language`, `metascore`, `plot`, `poster`, `rated`, `released`, `response`, `runtime`, `season`, `title`, `type`, `writer`, `year`, `imdbID`, `imdbRating`, `imdbVotes`, `seriesID`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -32,28 +30,18 @@ public class SentenciasSQL {
     }
     
     public static PreparedStatement getSelectAll() throws SQLException{
-        selectAllSerie = Conexion.getConexion().prepareStatement("SELECT seire.imdbID AS ID, seire.title AS NOM FROM seire");
+        selectAllSerie = Conexion.getConexion().prepareStatement("SELECT seire.actors AS AC, seire.awards AS AW, seire.country AS CO, seire.director AS DI, seire.episode AS EP, seire.genre AS GE, seire.`language` AS LA, seire.metascore AS ME, seire.plot AS PL, seire.poster AS PO, seire.rated AS RA, seire.released AS RE, seire.response AS RES, seire.runtime AS RU, seire.season AS SE, seire.title AS TI, seire.type AS TY, seire.writer AS WR, seire.`year` AS YE, seire.imdbID AS IMID, seire.imdbRating AS IMRA, seire.imdbVotes AS IMVO, seire.seriesID AS SER FROM seire");
         return selectAllSerie;
-    }
-    
-    public static PreparedStatement getSelectByName() throws SQLException{
-        selectByName = Conexion.getConexion().prepareStatement("SELECT * FROM seire WHERE title LIKE ?");
-        return selectByName;
-    }
-    
-    public static PreparedStatement getSelectByYear() throws SQLException{
-        selectByYear = Conexion.getConexion().prepareStatement("SELECT * FROM seire WHERE year LIKE ?");
-        return selectByYear;
-    }
-    
-    public static PreparedStatement getSelectByNamYear() throws SQLException{
-        selectByNamYear = Conexion.getConexion().prepareStatement("SELECT * FROM seire WHERE seire.`year` = ? AND seire.title = ?");
-        return selectByNamYear;
     }
     
     public static PreparedStatement setInsertRating() throws SQLException{
         insertRating = Conexion.getConexion().prepareStatement("INSERT INTO `omdbapi`.`rating` (`imdbID`, `source`, `value`) VALUES (?, ?, ?)");
         return insertRating;
+    }
+    
+    public static PreparedStatement getSelectRating() throws SQLException{
+        selectRatings = Conexion.getConexion().prepareStatement("SELECT rating.source, rating.`value` FROM rating WHERE rating.imdbID = ?");
+        return selectRatings;
     }
     
 }

@@ -6,6 +6,10 @@
 package datos;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  * Clase que ejecuta las operaciones con la base de datos
@@ -97,5 +101,99 @@ public class Operaciones {
             System.out.println("+--------------------------------------------------+");
         }
         return estado;
+    }
+    
+    /***
+     * 
+     * @param id
+     * @return 
+     */
+    public static ArrayList<Serie> getSerieDatos(){
+        
+        ArrayList<Serie> lista = new ArrayList<>();
+        try {
+
+            PreparedStatement stat = SentenciasSQL.getSelectAll();
+            
+            ResultSet rs = stat.executeQuery();
+
+            if (rs != null) {
+                while (rs.next()) {
+                    Serie s = new Serie();
+                    s.setActors(rs.getString("AC"));                    
+                    s.setAwards(rs.getString("AW"));
+                    s.setCountry(rs.getString("CO"));
+                    s.setDirector(rs.getString("DI"));
+                    s.setEpisode(rs.getString("EP"));
+                    s.setGenre(rs.getString("GE"));
+                    s.setLanguage(rs.getString("LA"));
+                    s.setMetascore(rs.getString("ME"));
+                    s.setPlot(rs.getString("PL"));
+                    s.setPoster(rs.getString("PO"));
+                    s.setRated(rs.getString("RA"));
+                    s.setReleased(rs.getString("RE"));
+                    s.setResponse(rs.getString("RES"));
+                    s.setRuntime(rs.getString("RU"));
+                    s.setSeason(rs.getString("SE"));
+                    s.setTitle(rs.getString("TI"));
+                    s.setType(rs.getString("TY"));
+                    s.setWriter(rs.getString("WR"));
+                    s.setYear(rs.getString("YE"));
+                    s.setImdbID(rs.getString("IMID"));
+                    s.setImdbRating(rs.getString("IMRA"));
+                    s.setImdbVotes(rs.getString("IMVO"));
+                    s.setSeriesID(rs.getString("SER"));
+                    
+                    s.setRatings(getRating(s.getImdbID()));
+                    
+                    lista.add(s);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("+--------------------------------------------------+");
+            System.out.println("|     Error al tratar de traer los datos.          |");
+            System.out.println("+--------------------------------------------------+");
+            System.out.println(e.getMessage());
+            System.out.println("+--------------------------------------------------+");
+
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * 
+     * @param id
+     * @return 
+     */
+    private static List<Rating> getRating(String id){        
+        List<Rating> lista = new ArrayList<>();
+        try {
+
+            PreparedStatement stat = SentenciasSQL.getSelectRating();
+            stat.setString(1, id);
+            
+            ResultSet rs = stat.executeQuery();
+
+            if (rs != null) {
+                while (rs.next()) {
+                    Rating ra = new Rating();
+                    ra.setSource(rs.getString("source"));
+                    ra.setValue(rs.getString("value"));
+                    lista.add(ra);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("+--------------------------------------------------+");
+            System.out.println("|     Error al tratar de traer los datos.          |");
+            System.out.println("+--------------------------------------------------+");
+            System.out.println("|     Codigo de error=>"+id+".       |");
+            System.out.println(e.getMessage());
+            System.out.println("+--------------------------------------------------+");
+
+        }
+        return lista;
     }
 }
